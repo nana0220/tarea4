@@ -10,28 +10,29 @@
 
 void main(int argc,char **argv){
 
-int f=atof(argv[2]);
-int n=atoi(argv[2]);
+  int f=atof(argv[2]);
 
-// n es el grado que se recibe por entrada
+  int n=atoi(argv[2]);
 
-if(n < 0) {
+  // n es el grado que se recibe por entrada
+
+  if(n < 0) {
      printf("\n El numero es negativo");
-exit(1);
+     exit(1);
    }
-if(f%1) {
+  if(f%1) {
      printf("\n El numero debe ser entero");
-exit(1);
+     exit(1);
    }
 
- FILE *in;
- in=fopen(argv[1],"r");
+  FILE *in;
+  in=fopen(argv[1],"r");
 
- double *x;
- double *y;
+  double *x;
+  double *y;
 
-int lineas=0;
-int letra=0;
+  int lineas=0;
+  int letra=0;
 
   //contar lineas archivo
 
@@ -54,10 +55,10 @@ int letra=0;
   int i,j;
   int s; //signo permutaciones
 
-x = malloc(lineas * sizeof(float));
-y = malloc(lineas * sizeof(float));
+  x = malloc(lineas * sizeof(float));
+  y = malloc(lineas * sizeof(float));
 
- printf("se crea aloc memoria con los datos");
+  printf("se crea aloc memoria con los datos\n");
 
 
  //guardar datos en matriz
@@ -72,8 +73,8 @@ y = malloc(lineas * sizeof(float));
 
  //dandole memoria a matriz y transpuesta
 
-M=malloc(sizeof(float)*lineas*(columnas));
-MT=malloc(sizeof(float)*lineas*(columnas));
+ M=malloc(sizeof(float)*lineas*(columnas));
+ MT=malloc(sizeof(float)*lineas*(columnas));
 
 //creando matriz normal
 
@@ -86,7 +87,7 @@ MT=malloc(sizeof(float)*lineas*(columnas));
    }
   }
 
-  //crenaod matriz transpuesta
+  //creando matriz transpuesta
    for(i=0;i<lineas;i++){
 
     for(j=0;j<columnas;j++){
@@ -95,61 +96,63 @@ MT=malloc(sizeof(float)*lineas*(columnas));
       M[pos]=pow(x[i],j);
    }
   }
-   printf("las matrices han sido creadas");
+   printf("las matrices han sido creadas\n");
 
    
-gsl_matrix_view m= gsl_matrix_view_array (M, lineas, columnas);
-gsl_matrix_view mt= gsl_matrix_view_array (MT, columnas, lineas);
+   gsl_matrix_view M1= gsl_matrix_view_array (M, lineas, columnas);
+   gsl_matrix_view MT1= gsl_matrix_view_array (MT, columnas, lineas);
 
- printf("matrices en terminos de gsl");
+   printf("matrices en terminos de gsl\n");
 
- gsl_matrix_view v=gsl_matrix_view_array(y,lineas,1);
+   gsl_matrix_view v=gsl_matrix_view_array(y,lineas,1);
 
-  printf("se creo v\n");
+   printf("se creo v\n");
 
-gsl_matrix * multiplicacion = gsl_matrix_alloc(columnas,columnas);
-  gsl_matrix * prueba = gsl_matrix_alloc(columnas,columnas);
+   gsl_matrix * multiplicacion = gsl_matrix_alloc(columnas,columnas);
+   gsl_matrix * prueba = gsl_matrix_alloc(columnas,columnas);
 
-  printf("se crearon matrices de multiplicacion y de prueba");
+   printf("se crearon matrices de multiplicacion y de prueba\n");
 
   //inversa
-gsl_matrix * inversa = gsl_matrix_alloc(columnas,columnas);
-//total
-gsl_matrix * total = gsl_matrix_alloc(columnas,columnas);
+   gsl_matrix * inversa = gsl_matrix_alloc(columnas,columnas);
+   //total
+   gsl_matrix * total = gsl_matrix_alloc(columnas,lineas);
 
- printf("se crea matriz total e inversa");
+   printf("se crea matriz total e inversa\n");
 
- gsl_matrix *vector;
- vector=&v.matrix;
- gsl_matrix*m=gsl_matrix_alloc(lineas,columnas);
- m=&m.matrix;
- gsl_matrix *mt=gsl_matrix_alloc(columnas,lineas);
- mt=&MT.matrix;
+   gsl_matrix *vector;
+   vector=&v.matrix;
+   gsl_matrix *m= gsl_matrix_alloc(lineas,columnas);
+   m=&M1.matrix;
+   gsl_matrix *mt= gsl_matrix_alloc(columnas,lineas);
+   mt=&MT1.matrix;
+   
+   printf("se creo  matriz y vectores\n");
 
-gsl_blas_dgemm(CblasNoTrans, CblasNoTrans, 1.0, m, mt, 0.0, multiplicacion);
-gsl_blas_dgemm(CblasNoTrans, CblasNoTrans, 1.0, mt, m, 0.0, prueba);
+   gsl_blas_dgemm(CblasNoTrans, CblasNoTrans, 1.0, mt, m, 0.0, multiplicacion);
+   gsl_blas_dgemm(CblasNoTrans, CblasNoTrans, 1.0, mt, m, 0.0, prueba);
 
   // matriz de permutacion para el algoritmo LU
   gsl_permutation * perm = gsl_permutation_alloc (columnas);
   
   printf("SE CREO la matriz de permutacion \n");
 
-gsl_linalg_LU_decomp(prueba,perm,&s);
-gsl_linalg_LU_invert(prueba, perm, inversa);
+  gsl_linalg_LU_decomp(prueba,perm,&s);
+  gsl_linalg_LU_invert(prueba, perm, inversa);
 
- printf("se creo descomp lu");
+  printf("se creo descomp lu \n");
 
-gsl_blas_dgemm(CblasNoTrans, CblasNoTrans, 1.0, inversa, mt, 0.0, total);
+  gsl_blas_dgemm(CblasNoTrans, CblasNoTrans, 1.0, inversa, mt, 0.0, total);
 
-gsl_matrix * result = gsl_matrix_alloc(columnas,1);
+  gsl_matrix * result = gsl_matrix_alloc(columnas,1);
 
-gsl_blas_dgemm(CblasNoTrans, CblasNoTrans, 1.0, total, vector, 0.0, result);
+  gsl_blas_dgemm(CblasNoTrans, CblasNoTrans, 1.0, total, vector, 0.0, result);
 
-gsl_matrix * chi= gsl_matrix_alloc(lineas,1);
+  gsl_matrix * chi= gsl_matrix_alloc(lineas,1);
 
-gsl_blas_dgemm(CblasNoTrans, CblasNoTrans, 1.0, m, result, 0.0, chi);
+  gsl_blas_dgemm(CblasNoTrans, CblasNoTrans, 1.0, m, result, 0.0, chi);
 
-printf("se han sacado los coeficientes An");
+  printf("se han sacado los coeficientes An \n");
 
 
 /*sacando chi cuadrado*/
@@ -162,7 +165,7 @@ printf("se han sacado los coeficientes An");
     xi=xi+ pow((y[i]- gsl_matrix_get(chi, i, 0)),2)/lineas;
   }
 
-// imprime resultado
+  //impresion de resultados
 
    for(i=0;i<lineas;i++){
 
@@ -171,9 +174,6 @@ printf("se han sacado los coeficientes An");
    }
 
    printf("X²=%lf\n",xi);
-
-
-
 
 
 }
