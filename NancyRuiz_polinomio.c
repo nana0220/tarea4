@@ -10,6 +10,11 @@
 
 void main(int argc,char **argv){
 
+  if(argc<3){
+    printf("el programa debe correrse con archivo + grado");
+      exit(1);
+  }
+
   int f=atof(argv[2]);
 
   int n=atoi(argv[2]);
@@ -78,12 +83,12 @@ void main(int argc,char **argv){
 
 //creando matriz normal
 
-  for(i=0;i<lineas;i++){
+ for(i=0;i<lineas;i++){
 
-    for(j=0;j<columnas;j++){
+   for(j=0;j<columnas;j++){
 
-      pos=j+(lineas*i);
-      M[pos]=pow(x[i],j);
+     pos=j+(lineas*i);
+     M[pos]=pow(x[i],j);
    }
   }
 
@@ -159,7 +164,8 @@ void main(int argc,char **argv){
 
   double xi=0;	
 
-  for(i=0;i<lineas;i++){
+  for(i=0;i<columnas;i++){
+
     printf("%d\n",i);
     printf("%lf\n",gsl_matrix_get(chi, i, 0));
     xi=xi+ pow((y[i]- gsl_matrix_get(chi, i, 0)),2)/lineas;
@@ -169,7 +175,7 @@ void main(int argc,char **argv){
 
    for(i=0;i<lineas;i++){
 
-     printf("m%d = %lf\n",i,gsl_matrix_get(result,i,0));
+     printf("A%d = %lf\n",i,gsl_matrix_get(result,i,0));
 
    }
 
